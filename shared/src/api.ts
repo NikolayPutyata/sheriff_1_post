@@ -10,7 +10,7 @@ export interface MeResponse {
   isKiosk: boolean;
   /** Верифікація акаунта (адміну й планшету — завжди approved). */
   access: AccessStatus;
-  /** Нікнейм, вказаний у запиті на доступ. */
+  /** Нікнейм Telegram (@username), з яким надіслано запит на доступ. */
   nickname: string | null;
   /** Охоронник, якого цей Telegram-акаунт додав (прив'язаний), або null. */
   ownGuard: GuardDto | null;
@@ -23,6 +23,8 @@ export interface GuardDto {
   fullName: string;
   isActive: boolean;
   hasTelegram: boolean;
+  /** Лише для адміна: нікнейм Telegram того, хто додав себе. */
+  tgUsername?: string;
 }
 
 export interface HandoverDto {

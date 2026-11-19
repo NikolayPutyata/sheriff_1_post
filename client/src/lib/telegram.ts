@@ -20,6 +20,7 @@ export interface TgWebApp {
   onEvent(e: string, cb: () => void): void;
   offEvent(e: string, cb: () => void): void;
   showConfirm(message: string, cb: (ok: boolean) => void): void;
+  openTelegramLink(url: string): void;
   HapticFeedback: Haptic;
   BackButton: { show(): void; hide(): void; onClick(cb: () => void): void; offClick(cb: () => void): void };
 }
@@ -61,6 +62,12 @@ export const haptic = {
 export function confirmAsync(message: string): Promise<boolean> {
   if (inTelegram && tg!.isVersionAtLeast('6.2')) return new Promise((r) => tg!.showConfirm(message, r));
   return Promise.resolve(window.confirm(message));
+}
+
+/** Відкрити чат у Telegram (t.me/...) — всередині Telegram, без браузера. */
+export function openTelegramLink(url: string) {
+  if (inTelegram && tg!.isVersionAtLeast('6.1')) tg!.openTelegramLink(url);
+  else window.open(url, '_blank', 'noopener');
 }
 
 /** Системна кнопка «Назад» Telegram (для закриття вікна вибору). */

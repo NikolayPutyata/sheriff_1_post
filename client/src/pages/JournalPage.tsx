@@ -24,6 +24,13 @@ const PERIODS: { value: Period; label: string }[] = [
   { value: 'range', label: 'Період' },
 ];
 const STATUS_FILTERS: HandoverStatus[] = ['pending', 'received', 'rejected'];
+/** Сервер видаляє здачі, старші за 3 місяці */
+const RETENTION_MONTHS = 3;
+const minDay = () => {
+  const d = new Date();
+  d.setMonth(d.getMonth() - RETENTION_MONTHS);
+  return isoDay(d);
+};
 
 export function JournalPage() {
   const qc = useQueryClient();
@@ -70,8 +77,9 @@ export function JournalPage() {
 
       {period === 'range' && (
         <div className="grid grid-cols-2 gap-2">
-          <DateInput label="З" value={from} onChange={setFrom} max={to} />
-          <DateInput label="По" value={to} onChange={setTo} min={from} />
+          <DateInput label="З" value={from} onChange={setFrom} min={minDay()} max={to} />
+          <DateInput label="По" value={to} onChange={setTo} min={from} max={isoDay()} />
+          <p className="col-span-2 text-xs text-hint">Записи, старші за {RETENTION_MONTHS} місяці, видаляються автоматично.</p>
         </div>
       )}
 

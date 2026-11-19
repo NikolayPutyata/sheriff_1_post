@@ -66,7 +66,7 @@ export function GuardsPage() {
       {q.data && (
         <>
           <p className="text-sm text-hint">
-            Активні: {active.length} · 🔗 — прив’язаний Telegram (додав себе сам)
+            Активні: {active.length} · 🔗 — додав себе сам зі свого Telegram
           </p>
           <div className="overflow-hidden rounded-2xl bg-card shadow-sm">
             {active.map((g) => (
@@ -132,6 +132,7 @@ function GuardRow({ g, onChanged }: { g: GuardDto; onChanged: () => void }) {
     <div className={cx('flex items-center gap-2 border-b border-separator px-4 py-2 last:border-b-0', !g.isActive && 'opacity-60')}>
       <span className="min-w-0 flex-1 py-1 leading-snug break-words">
         {g.fullName} {g.hasTelegram && <span title="Прив’язаний Telegram">🔗</span>}
+        {g.tgUsername && <span className="block text-xs text-hint">{g.tgUsername}</span>}
       </span>
       <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
         Змінити

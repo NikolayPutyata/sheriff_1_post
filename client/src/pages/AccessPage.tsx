@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { AccessDto } from '@journal/shared';
 import { api, errorMessage } from '../lib/api';
 import { fmtDateTime } from '../lib/format';
-import { confirmAsync, haptic } from '../lib/telegram';
+import { confirmAsync, haptic, openTelegramLink } from '../lib/telegram';
 import { Button, Card, ErrorNote, Spinner } from '../components/ui';
 
 export const accessQuery = {
@@ -76,11 +76,17 @@ function Who({ a }: { a: AccessDto }) {
   return (
     <div className="min-w-0">
       <div className="truncate font-semibold">{a.nickname}</div>
-      <div className="truncate text-sm text-hint">
-        {a.tgName}
-        {a.tgUsername && ` · @${a.tgUsername}`}
-      </div>
+      <div className="truncate text-sm text-hint">{a.tgName}</div>
     </div>
+  );
+}
+
+function ChatButton({ a }: { a: AccessDto }) {
+  if (!a.tgUsername) return null;
+  return (
+    <Button size="sm" variant="ghost" onClick={() => openTelegramLink(`https://t.me/${a.tgUsername}`)}>
+      💬 Написати
+    </Button>
   );
 }
 
@@ -92,7 +98,13 @@ function PendingCard({ a }: { a: AccessDto }) {
         <Who a={a} />
         <span className="shrink-0 text-xs text-hint">{fmtDateTime(a.requestedAt)}</span>
       </div>
-      <div className="text-xs text-hint">Telegram ID: {a.tgUserId}</div>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs text-hint">Telegram ID: {a.tgUserId}</span>
+        <ChatButton a={a} />
+      </div>
+      <p className="rounded-xl bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
+        Охоронник має написати вам особисто з акаунта {a.nickname}. Підтверджуйте, лише коли переконались, що це він.
+      </p>
       <div className="grid grid-cols-2 gap-2">
         <Button variant="success" loading={decide.isPending && decide.variables === 'approved'} onClick={() => decide.mutate('approved')}>
           ✅ Підтвердити
@@ -113,6 +125,7 @@ function Row({ a, action }: { a: AccessDto; action: 'approved' | 'rejected' }) {
       <div className="min-w-0 flex-1">
         <Who a={a} />
       </div>
+      <ChatButton a={a} />
       <Button
         size="sm"
         variant={action === 'rejected' ? 'danger' : 'secondary'}
