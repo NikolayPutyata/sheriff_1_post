@@ -65,8 +65,8 @@ const statusStyles: Record<HandoverStatus, string> = {
   pending: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
   received: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
   rejected: 'bg-red-500/15 text-red-700 dark:text-red-300',
-  scanned: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
-  transferred: 'bg-violet-500/15 text-violet-700 dark:text-violet-300',
+  with_manager: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
+  legal: 'bg-violet-500/15 text-violet-700 dark:text-violet-300',
 };
 
 export function StatusBadge({ status }: { status: HandoverStatus }) {

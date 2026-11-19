@@ -1,30 +1,36 @@
 // Дзеркало сервера: AUTO_WORD_GENERATOR/src/journal/statuses.js
 
 /**
- * pending      — працівник натиснув «Здав», чекає на адміна
- * received     — адмін підтвердив отримання паперового примірника
- * rejected     — адмін відмовив (заявку скасовано)
- * scanned      — (фаза 2) відскановано
- * transferred  — (фаза 2) передано у відділ
+ * pending       — працівник натиснув «Здав», чекає на адміна
+ * received      — адмін прийняв паперовий примірник (договір на посту)
+ * rejected      — адмін відмовив (фінал)
+ * with_manager  — менеджер забрав, адмін підтвердив передачу (фінал)
+ * legal         — адмін передав у ЮВ (фінал)
+ * Фінальні статуси зберігаються 3 місяці, потім видаляються.
  */
-export const HANDOVER_STATUSES = ['pending', 'received', 'rejected', 'scanned', 'transferred'] as const;
+export const HANDOVER_STATUSES = ['pending', 'received', 'rejected', 'with_manager', 'legal'] as const;
 export type HandoverStatus = (typeof HANDOVER_STATUSES)[number];
 
 export const STATUS_LABELS: Record<HandoverStatus, string> = {
   pending: 'Очікує',
   received: 'Отримано',
   rejected: 'Відмовлено',
-  scanned: 'Відскановано',
-  transferred: 'Передано',
+  with_manager: 'У менеджера',
+  legal: 'Передано ЮВ',
 };
 
 export const STATUS_EMOJI: Record<HandoverStatus, string> = {
   pending: '⏳',
   received: '✅',
   rejected: '❌',
-  scanned: '🖨',
-  transferred: '📦',
+  with_manager: '📦',
+  legal: '⚖️',
 };
+
+/** Посади при верифікації. */
+export const ROLES = ['worker', 'manager'] as const;
+export type Role = (typeof ROLES)[number];
+export const ROLE_LABELS: Record<Role, string> = { worker: 'Інженер/охоронник', manager: 'Менеджер' };
 
 /** Шаблони причин відмови (код короткий, бо йде в callback_data Telegram — ліміт 64 байти). */
 export const REJECT_REASONS = {

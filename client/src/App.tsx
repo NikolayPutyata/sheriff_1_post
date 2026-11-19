@@ -11,21 +11,32 @@ import { JournalPage } from './pages/JournalPage';
 import { GuardsPage } from './pages/GuardsPage';
 import { AccessGate } from './pages/AccessGate';
 import { AccessPage, accessQuery } from './pages/AccessPage';
+import { ManagerBoard, ManagerMine } from './pages/ManagerPages';
 
-type Tab = 'submit' | 'mine' | 'journal' | 'guards' | 'access';
+type Tab = 'submit' | 'mine' | 'journal' | 'guards' | 'access' | 'board' | 'taken';
 const TAB_LABELS: Record<Tab, string> = {
   submit: 'Здати',
   mine: 'Мої здачі',
   journal: 'Журнал',
   guards: 'Працівники',
   access: 'Доступи',
+  board: '📍 На посту',
+  taken: '📦 Мої',
 };
 const TAB_KEY = 'last-tab';
 
 function tabsFor(me: MeResponse): Tab[] {
   if (me.isAdmin) return ['submit', 'journal', 'guards', 'access'];
   if (me.isKiosk) return ['submit'];
+  if (me.role === 'manager') return ['board', 'taken'];
   return ['submit', 'mine'];
+}
+
+function whoLabel(me: MeResponse) {
+  if (me.isAdmin) return '🛡 Адміністратор';
+  if (me.isKiosk) return '📟 Планшет';
+  if (me.role === 'manager') return `💼 ${me.fullName ?? 'Менеджер'}`;
+  return me.ownGuard?.fullName ?? me.fullName ?? me.user.firstName;
 }
 
 export function App() {
@@ -69,7 +80,7 @@ function Shell({ me }: { me: MeResponse }) {
     } catch {
       /* ignore */
     }
-    return 'submit';
+    return tabs[0]!;
   });
   useEffect(() => {
     try {
@@ -78,7 +89,7 @@ function Shell({ me }: { me: MeResponse }) {
       /* ignore */
     }
   }, [tab]);
-  const current = tabs.includes(tab) ? tab : 'submit';
+  const current = tabs.includes(tab) ? tab : tabs[0]!;
   const access = useQuery({ ...accessQuery, enabled: me.isAdmin });
   const pendingAccess = access.data?.filter((a) => a.status === 'pending').length ?? 0;
 
@@ -89,7 +100,7 @@ function Shell({ me }: { me: MeResponse }) {
           <div className="mb-2 flex items-baseline justify-between">
             <h1 className="text-lg font-bold">Журнал договорів</h1>
             <span className="truncate pl-3 text-xs text-hint">
-              {me.isAdmin ? '🛡 Адміністратор' : me.isKiosk ? '📟 Планшет' : (me.ownGuard?.fullName ?? me.user.firstName)}
+              {whoLabel(me)}
             </span>
           </div>
           {tabs.length > 1 && (
@@ -122,6 +133,8 @@ function Shell({ me }: { me: MeResponse }) {
         {current === 'journal' && <JournalPage />}
         {current === 'guards' && <GuardsPage />}
         {current === 'access' && <AccessPage />}
+        {current === 'board' && <ManagerBoard me={me} />}
+        {current === 'taken' && <ManagerMine />}
       </main>
     </>
   );

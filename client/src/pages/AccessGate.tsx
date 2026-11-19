@@ -1,9 +1,16 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { telegramUsernameSchema, type AccessDto, type MeResponse } from '@journal/shared';
+import {
+  fullNameSchema,
+  ROLE_LABELS,
+  telegramUsernameSchema,
+  type AccessDto,
+  type MeResponse,
+  type Role,
+} from '@journal/shared';
 import { api, errorMessage } from '../lib/api';
 import { haptic } from '../lib/telegram';
-import { Button, Card, ErrorNote } from '../components/ui';
+import { Button, Card, ErrorNote, cx } from '../components/ui';
 
 /**
  * Верифікація нового телефона: працівник вводить свій нікнейм з Telegram і надсилає запит,
@@ -17,9 +24,24 @@ export function AccessGate({ me, onRefresh, refreshing }: { me: MeResponse; onRe
         <Card className="space-y-3 text-center">
           <div className="text-5xl">⏳</div>
           <h1 className="text-xl font-semibold">Запит надіслано</h1>
-          <p className="text-hint">
-            Ваш нікнейм: <b className="text-text">{me.nickname}</b>
-          </p>
+          <div className="rounded-xl bg-bg p-3 text-left text-sm">
+            {me.fullName && (
+              <div className="flex justify-between gap-3 py-0.5">
+                <span className="text-hint">ПІБ</span>
+                <b>{me.fullName}</b>
+              </div>
+            )}
+            {me.role && (me.role === 'worker' || me.role === 'manager') && (
+              <div className="flex justify-between gap-3 py-0.5">
+                <span className="text-hint">Посада</span>
+                <b>{ROLE_LABELS[me.role]}</b>
+              </div>
+            )}
+            <div className="flex justify-between gap-3 py-0.5">
+              <span className="text-hint">Нікнейм</span>
+              <b>{me.nickname}</b>
+            </div>
+          </div>
           <p className="rounded-xl bg-accent/10 px-3 py-2 text-sm text-text">
             👉 Тепер <b>напишіть адміністратору особисто</b> в Telegram з цього акаунта, що це ви. Після перевірки він
             підтвердить доступ, а бот надішле вам повідомлення.
@@ -60,10 +82,13 @@ function NoUsername() {
 function RequestForm({ me }: { me: MeResponse }) {
   const qc = useQueryClient();
   const [nickname, setNickname] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [role, setRole] = useState<Role | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const send = useMutation({
-    mutationFn: (value: string) => api<AccessDto>('/access/request', { method: 'POST', body: { nickname: value } }),
+    mutationFn: (body: { nickname: string; fullName: string; role: Role }) =>
+      api<AccessDto>('/access/request', { method: 'POST', body }),
     onSuccess: () => {
       haptic.success();
       qc.invalidateQueries({ queryKey: ['me'] });
@@ -82,8 +107,11 @@ function RequestForm({ me }: { me: MeResponse }) {
     if (parsed.data.toLowerCase() !== me.user.username!.toLowerCase()) {
       return setError('Нікнейм не збігається з вашим у Telegram. Перевірте: Налаштування → Ім’я користувача.');
     }
+    const name = fullNameSchema.safeParse(fullName);
+    if (!name.success) return setError(name.error.issues[0]!.message);
+    if (!role) return setError('Оберіть посаду');
     setError(null);
-    send.mutate(parsed.data);
+    send.mutate({ nickname: parsed.data, fullName: name.data, role });
   }
 
   return (
@@ -115,6 +143,41 @@ function RequestForm({ me }: { me: MeResponse }) {
           />
         </div>
         <p className="text-xs text-hint">Саме той, що в Telegram: Налаштування → «Ім’я користувача».</p>
+      </Card>
+      <Card className="space-y-2">
+        <label htmlFor="fullName" className="block text-sm text-hint">
+          Прізвище, ім’я та по батькові
+        </label>
+        <input
+          id="fullName"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          autoComplete="name"
+          autoCapitalize="words"
+          placeholder="Іваненко Петро Олегович"
+          className="h-12 w-full rounded-xl border border-separator bg-card px-4 text-lg outline-none focus:border-accent"
+        />
+        <p className="text-xs text-hint">Пишіть уважно — так вас бачитимуть у журналі.</p>
+      </Card>
+      <Card className="space-y-2">
+        <span className="block text-sm text-hint">Посада</span>
+        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Посада">
+          {(['worker', 'manager'] as const).map((r) => (
+            <button
+              key={r}
+              type="button"
+              role="radio"
+              aria-checked={role === r}
+              onClick={() => setRole(r)}
+              className={cx(
+                'min-h-12 rounded-xl border px-3 py-2 text-sm font-medium transition',
+                role === r ? 'border-accent bg-accent text-accent-text' : 'border-separator bg-card',
+              )}
+            >
+              {ROLE_LABELS[r]}
+            </button>
+          ))}
+        </div>
       </Card>
       <p className="rounded-xl bg-accent/10 px-3 py-2 text-sm">
         Після надсилання <b>напишіть адміністратору особисто</b> з цього акаунта — так він переконається, що це ви.
