@@ -12,7 +12,8 @@ export function HandoverCard({ h, actions, showSubmitter }: { h: HandoverDto; ac
             Заявка №{h.seq} · {fmtDateTime(h.submittedAt)}
           </div>
           <div className="truncate text-lg font-bold tracking-wide">{h.contractNumber}</div>
-          <div className="truncate text-sm">{h.guardName}</div>
+          {h.clientName && <div className="text-sm leading-snug font-medium break-words">{h.clientName}</div>}
+          <div className="truncate text-sm text-hint">Працівник: {h.guardName}</div>
           {showSubmitter && (
             <div className="truncate text-xs text-hint">
               Надіслав: {h.submittedBy.nickname ? `${h.submittedBy.nickname} · ${h.submittedBy.name}` : h.submittedBy.name}

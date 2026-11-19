@@ -29,3 +29,17 @@ export const contractNumberSchema = z
       .regex(CONTRACT_CHARS, 'Дозволені лише літери, цифри та символи / - . _')
       .regex(/\d/, 'Номер має містити хоча б одну цифру'),
   );
+
+/** Повне найменування клієнта. Дзеркало сервера: AUTO_WORD_GENERATOR/src/journal/validation.js */
+export const CLIENT_NAME_MAX_LENGTH = 200;
+
+export const clientNameSchema = z
+  .string()
+  .transform((s) => s.trim().replace(/\s+/g, ' '))
+  .pipe(
+    z
+      .string()
+      .refine((s) => (s.match(/\p{L}/gu) ?? []).length >= 2, 'Вкажіть повне найменування клієнта')
+      .refine((s) => s.length <= CLIENT_NAME_MAX_LENGTH, `Найменування клієнта не довше за ${CLIENT_NAME_MAX_LENGTH} символів`)
+      .refine((s) => !/[<>{}\\]/.test(s), 'Найменування містить недопустимі символи'),
+  );

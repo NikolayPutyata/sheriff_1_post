@@ -86,7 +86,7 @@ export function JournalPage() {
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="🔍 Пошук за номером договору"
+        placeholder="🔍 Пошук за номером або клієнтом"
         className="h-11 w-full rounded-xl border border-separator bg-card px-4 outline-none focus:border-accent"
       />
 

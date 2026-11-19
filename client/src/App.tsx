@@ -17,7 +17,7 @@ const TAB_LABELS: Record<Tab, string> = {
   submit: 'Здати',
   mine: 'Мої здачі',
   journal: 'Журнал',
-  guards: 'Охоронці',
+  guards: 'Працівники',
   access: 'Доступи',
 };
 const TAB_KEY = 'last-tab';

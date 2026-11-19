@@ -88,7 +88,7 @@ function GuardSheet({
         <button type="button" onClick={back} className="h-10 rounded-lg px-2 text-accent">
           ← Назад
         </button>
-        <h2 className="flex-1 text-center font-semibold">{adding ? (addMode === 'self' ? 'Додати себе' : 'Новий охоронник') : 'Оберіть себе'}</h2>
+        <h2 className="flex-1 text-center font-semibold">{adding ? (addMode === 'self' ? 'Додати себе' : 'Новий працівник') : 'Оберіть себе'}</h2>
         <span className="w-16" />
       </div>
 
@@ -114,7 +114,7 @@ function GuardSheet({
                 onClick={() => setAdding(true)}
                 className="mb-3 flex h-12 w-full items-center gap-2 rounded-xl border border-dashed border-accent/50 px-4 font-medium text-accent"
               >
-                ＋ {addMode === 'self' ? 'Мене немає у списку — додати себе' : 'Додати охоронника'}
+                ＋ {addMode === 'self' ? 'Мене немає у списку — додати себе' : 'Додати працівника'}
               </button>
             )}
             {groups.length === 0 && (

@@ -6,7 +6,7 @@ import { haptic } from '../lib/telegram';
 import { Button, Card, ErrorNote } from '../components/ui';
 
 /**
- * Верифікація нового телефона: охоронник вводить свій нікнейм з Telegram і надсилає запит,
+ * Верифікація нового телефона: працівник вводить свій нікнейм з Telegram і надсилає запит,
  * потім пише адміну особисто — адмін вручну підтверджує доступ.
  */
 export function AccessGate({ me, onRefresh, refreshing }: { me: MeResponse; onRefresh: () => void; refreshing: boolean }) {

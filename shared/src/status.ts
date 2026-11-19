@@ -1,7 +1,7 @@
 // Дзеркало сервера: AUTO_WORD_GENERATOR/src/journal/statuses.js
 
 /**
- * pending      — охоронник натиснув «Здав», чекає на адміна
+ * pending      — працівник натиснув «Здав», чекає на адміна
  * received     — адмін підтвердив отримання паперового примірника
  * rejected     — адмін відмовив (заявку скасовано)
  * scanned      — (фаза 2) відскановано
@@ -30,7 +30,7 @@ export const STATUS_EMOJI: Record<HandoverStatus, string> = {
 export const REJECT_REASONS = {
   n: 'Немає паперового примірника',
   w: 'Невірний номер договору',
-  g: 'Невірно вказано охоронника',
+  g: 'Невірно вказано працівника',
   o: 'Інше',
 } as const;
 export type RejectReasonCode = keyof typeof REJECT_REASONS;

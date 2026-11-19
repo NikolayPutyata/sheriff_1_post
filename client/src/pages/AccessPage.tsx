@@ -11,7 +11,7 @@ export const accessQuery = {
   refetchInterval: 20_000,
 };
 
-/** Адмін: запити на доступ від телефонів охоронників. */
+/** Адмін: запити на доступ від телефонів працівників. */
 export function AccessPage() {
   const q = useQuery(accessQuery);
   if (q.isLoading)
@@ -103,7 +103,7 @@ function PendingCard({ a }: { a: AccessDto }) {
         <ChatButton a={a} />
       </div>
       <p className="rounded-xl bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
-        Охоронник має написати вам особисто з акаунта {a.nickname}. Підтверджуйте, лише коли переконались, що це він.
+        Працівник має написати вам особисто з акаунта {a.nickname}. Підтверджуйте, лише коли переконались, що це він.
       </p>
       <div className="grid grid-cols-2 gap-2">
         <Button variant="success" loading={decide.isPending && decide.variables === 'approved'} onClick={() => decide.mutate('approved')}>

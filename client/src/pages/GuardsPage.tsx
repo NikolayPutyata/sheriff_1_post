@@ -38,7 +38,7 @@ export function GuardsPage() {
       <Card>
         <form onSubmit={onAdd} className="space-y-2">
           <label htmlFor="newGuard" className="block text-sm text-hint">
-            Додати охоронника (напр. для того, хто здає лише через планшет)
+            Додати працівника (напр. для того, хто здає лише через планшет)
           </label>
           <div className="flex gap-2">
             <input

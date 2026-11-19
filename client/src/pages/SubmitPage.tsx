@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  clientNameSchema,
+  CLIENT_NAME_MAX_LENGTH,
   contractNumberSchema,
   normalizeContractNumber,
   CONTRACT_MAX_LENGTH,
@@ -32,6 +34,7 @@ export function SubmitPage({ me }: { me: MeResponse }) {
   const guards = useQuery({ queryKey: ['guards'], queryFn: () => api<GuardDto[]>('/guards') });
 
   const [number, setNumber] = useState('');
+  const [client, setClient] = useState('');
   const [guardId, setGuardId] = useState<string | null>(me.ownGuard?.id ?? null);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<CreateHandoverResponse | null>(null);
@@ -42,7 +45,7 @@ export function SubmitPage({ me }: { me: MeResponse }) {
   }, [me.ownGuard, guardId]);
 
   const submit = useMutation({
-    mutationFn: (body: { contractNumber: string; guardId: string }) =>
+    mutationFn: (body: { contractNumber: string; clientName: string; guardId: string }) =>
       api<CreateHandoverResponse>('/handovers', { method: 'POST', body }),
     onSuccess: (res) => {
       haptic.success();
@@ -59,17 +62,20 @@ export function SubmitPage({ me }: { me: MeResponse }) {
   function reset() {
     setDone(null);
     setNumber('');
+    setClient('');
     setError(null);
-    if (shared) setGuardId(null); // наступний охоронник обирає себе сам
+    if (shared) setGuardId(null); // наступний працівник обирає себе сам
   }
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = contractNumberSchema.safeParse(number);
     if (!parsed.success) return setError(parsed.error.issues[0]!.message);
+    const clientParsed = clientNameSchema.safeParse(client);
+    if (!clientParsed.success) return setError(clientParsed.error.issues[0]!.message);
     if (!guardId) return setError('Оберіть себе зі списку');
     setError(null);
-    submit.mutate({ contractNumber: parsed.data, guardId });
+    submit.mutate({ contractNumber: parsed.data, clientName: clientParsed.data, guardId });
   }
 
   if (done) return <SuccessView res={done} shared={shared} onNext={reset} />;
@@ -99,7 +105,24 @@ export function SubmitPage({ me }: { me: MeResponse }) {
         </div>
 
         <div className="space-y-1.5">
-          <span className="block text-sm text-hint">Охоронник</span>
+          <label htmlFor="client" className="block text-sm text-hint">
+            Повне найменування клієнта
+          </label>
+          <textarea
+            id="client"
+            value={client}
+            onChange={(e) => setClient(e.target.value)}
+            maxLength={CLIENT_NAME_MAX_LENGTH + 20}
+            rows={2}
+            autoComplete="off"
+            autoCapitalize="sentences"
+            placeholder="Напр. ТОВ «Альфа-Сервіс» або ФОП Іваненко Петро Олегович"
+            className="w-full resize-none rounded-xl border border-separator bg-card px-4 py-3 text-base leading-snug outline-none focus:border-accent"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <span className="block text-sm text-hint">Працівник</span>
           {guards.isLoading ? (
             <div className="flex h-14 items-center justify-center">
               <Spinner />
@@ -147,7 +170,8 @@ function SuccessView({ res, shared, onNext }: { res: CreateHandoverResponse; sha
         <div className="rounded-xl bg-bg p-3 text-left text-sm">
           <Row k="Заявка" v={`№${h.seq}`} />
           <Row k="Договір" v={h.contractNumber} />
-          <Row k="Охоронник" v={h.guardName} />
+          {h.clientName && <Row k="Клієнт" v={h.clientName} />}
+          <Row k="Працівник" v={h.guardName} />
           <Row k="Здано" v={fmtDateTime(h.submittedAt)} />
         </div>
         {res.duplicates > 0 && (

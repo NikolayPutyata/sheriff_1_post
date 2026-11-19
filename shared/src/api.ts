@@ -12,9 +12,9 @@ export interface MeResponse {
   access: AccessStatus;
   /** Нікнейм Telegram (@username), з яким надіслано запит на доступ. */
   nickname: string | null;
-  /** Охоронник, якого цей Telegram-акаунт додав (прив'язаний), або null. */
+  /** Працівник, якого цей Telegram-акаунт додав (прив'язаний), або null. */
   ownGuard: GuardDto | null;
-  /** Чи може цей акаунт додати охоронника (себе — один раз; адмін — без обмежень; планшет — ні). */
+  /** Чи може цей акаунт додати працівника (себе — один раз; адмін — без обмежень; планшет — ні). */
   canAddGuard: boolean;
 }
 
@@ -31,6 +31,8 @@ export interface HandoverDto {
   id: string;
   seq: number;
   contractNumber: string;
+  /** Повне найменування клієнта (у старих записах може бути відсутнє). */
+  clientName?: string;
   guardId: string;
   guardName: string;
   submittedAt: string;
@@ -51,6 +53,7 @@ export interface HandoverListResponse {
 
 export interface CreateHandoverRequest {
   contractNumber: string;
+  clientName: string;
   guardId: string;
 }
 
