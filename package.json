@@ -1,0 +1,13 @@
+{
+  "name": "sheriff-1-post",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Журнал передачі договорів — Telegram Mini App (фронт). Сервер: AUTO_WORD_GENERATOR/src/journal",
+  "workspaces": ["shared", "client"],
+  "scripts": {
+    "dev": "npm run dev -w client",
+    "build": "npm run build -w client",
+    "typecheck": "npm run typecheck -w client"
+  },
+  "engines": { "node": ">=20" }
+}

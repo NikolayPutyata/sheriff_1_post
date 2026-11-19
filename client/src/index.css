@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+/* темна тема: клас .dark ставимо самі — за темою Telegram, а не ОС */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* запасні кольори (поза Telegram) */
+:root {
+  --fb-bg: #f1f2f6;
+  --fb-card: #ffffff;
+  --fb-text: #111827;
+  --fb-hint: #6b7280;
+  --fb-accent: #2481cc;
+  --fb-accent-text: #ffffff;
+  --fb-danger: #dc2626;
+  --fb-separator: #e5e7eb;
+}
+:root.dark {
+  --fb-bg: #0f1115;
+  --fb-card: #1c1f26;
+  --fb-text: #f3f4f6;
+  --fb-hint: #9ca3af;
+  --fb-accent: #3b9be0;
+  --fb-accent-text: #ffffff;
+  --fb-danger: #f87171;
+  --fb-separator: #2d313a;
+}
+
+/* у Telegram — кольори з теми користувача */
+@theme inline {
+  --color-bg: var(--tg-theme-secondary-bg-color, var(--fb-bg));
+  --color-card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, var(--fb-card)));
+  --color-text: var(--tg-theme-text-color, var(--fb-text));
+  --color-hint: var(--tg-theme-hint-color, var(--fb-hint));
+  --color-accent: var(--tg-theme-button-color, var(--fb-accent));
+  --color-accent-text: var(--tg-theme-button-text-color, var(--fb-accent-text));
+  --color-danger: var(--tg-theme-destructive-text-color, var(--fb-danger));
+  --color-separator: var(--tg-theme-section-separator-color, var(--fb-separator));
+}
+
+/* базові стилі — в шарі base, щоб утиліти Tailwind (text-sm тощо) мали пріоритет */
+@layer base {
+  html,
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-family:
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+    overscroll-behavior-y: none;
+  }
+  input[type='date'] {
+    color-scheme: light;
+  }
+  .dark input[type='date'] {
+    color-scheme: dark;
+  }
+}
