@@ -45,11 +45,14 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
       body: init.body === undefined ? undefined : JSON.stringify(init.body),
     });
   } catch {
-    throw new ApiError(0, 'Немає зʼєднання з сервером. Перевірте інтернет і спробуйте ще раз.');
+    throw new ApiError(0, `Немає зʼєднання з сервером (${API_BASE}). Перевірте інтернет і спробуйте ще раз.`);
   }
   // не JSON — запит пішов не на сервер журналу (напр. не задано VITE_API_URL на Vercel)
   if (!(res.headers.get('content-type') ?? '').includes('application/json')) {
-    throw new ApiError(res.status, 'Сервер журналу недоступний. Перевірте змінну VITE_API_URL на Vercel.');
+    throw new ApiError(
+      res.status,
+      `Сервер журналу недоступний (запит на ${API_BASE}${path}, HTTP ${res.status}). Перевірте змінну VITE_API_URL на Vercel і зробіть Redeploy.`,
+    );
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new ApiError(res.status, data?.error ?? `Помилка сервера (${res.status})`, data?.code);
