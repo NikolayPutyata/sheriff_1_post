@@ -3,11 +3,16 @@
   "private": true,
   "version": "1.0.0",
   "description": "Журнал передачі договорів — Telegram Mini App (фронт). Сервер: AUTO_WORD_GENERATOR/src/journal",
-  "workspaces": ["shared", "client"],
+  "workspaces": [
+    "shared",
+    "client"
+  ],
   "scripts": {
     "dev": "npm run dev -w client",
-    "build": "npm run build -w client",
+    "build": "npm run build -w client && node -e \"const fs=require('fs');fs.rmSync('dist',{recursive:true,force:true});fs.cpSync('client/dist','dist',{recursive:true})\"",
     "typecheck": "npm run typecheck -w client"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }
